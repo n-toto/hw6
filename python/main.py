@@ -131,6 +131,15 @@ def PrettyMove(move):
     m = move["Where"]
     return '%s%d' % (chr(ord('A') + m[0] - 1), m[1])
 
+def calcScore(board):
+    score = 0
+    for row in board["Pieces"]:
+        for cell in row:
+            if(cell == 1):
+                score += 1
+            elif(cell == 2):
+                score -= 1
+    return score
 
 class MainHandler(webapp2.RequestHandler):
     # Handling GET request, just for debugging purposes.
@@ -168,8 +177,12 @@ Paste JSON here:<p/><textarea name=json cols=80 rows=24></textarea>
             # TO STEP STUDENTS:
             # You'll probably want to change how this works, to do something
             # more clever than just picking a random move.
-            move = random.choice(valid_moves)
-            self.response.write(PrettyMove(move))
+            score = {}
+            for choice in valid_moves:
+                score[PrettyMove(choice)] = calcScore(g._board)
+            maxscore = max(score.items(), key = lambda x: x[1])
+            self.response.write(maxscore[0])
+            #self.response.write(PrettyMove(move))    
 
 
 app = webapp2.WSGIApplication([
